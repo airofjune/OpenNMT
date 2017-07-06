@@ -129,7 +129,7 @@ end
 
 local function main()
   local opt = cmd:parse(arg)
-
+  torch.setnumthreads(44)
   torch.manualSeed(opt.seed)
 
   -- Initialize global context.

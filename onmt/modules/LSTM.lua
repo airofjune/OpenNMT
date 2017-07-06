@@ -103,6 +103,22 @@ function LSTM:_buildModel(layers, inputSize, hiddenSize, dropout, residual, drop
   return nn.gModule(inputs, outputs)
 end
 
+
+
+function StartPool(num)
+   _G.threads = require('threads')
+   _G.threads.serialization('threads.sharedserialize')
+   _G.pool = _G.threads( 
+                 num,   
+                 function()   
+                   require('nn') 
+                 end)      
+   --_G.pool:specific(true) 
+end 
+
+nThread = 1
+StartPool(nThread)
+ 
 --[[ Build a single LSTM unit layer. ]]
 function LSTM:_buildLayer(inputSize, hiddenSize)
   local inputs = {}
@@ -115,8 +131,13 @@ function LSTM:_buildLayer(inputSize, hiddenSize)
   local x = inputs[3]
 
   -- Evaluate the input sums at once for efficiency.
-  local i2h = nn.Linear(inputSize, 4 * hiddenSize)(x)
-  local h2h = nn.Linear(hiddenSize, 4 * hiddenSize)(prevH)
+  --local i2h = nn.Linear(inputSize, 4 * hiddenSize)(x)
+  --local h2h = nn.Linear(hiddenSize, 4 * hiddenSize)(prevH)
+  local m = nn.ParallelTableCPU(nThread):add(nn.Linear(inputSize, 4 * hiddenSize)):add(nn.Linear(hiddenSize, 4 * hiddenSize))
+  --local m = nn.ParallelTable():add(nn.Linear(inputSize, 4 * hiddenSize)):add(nn.Linear(hiddenSize, 4 * hiddenSize))
+  local i2h, h2h = m({x, prevH})
+
+
   local allInputSums = nn.CAddTable()({i2h, h2h})
 
   local reshaped = nn.Reshape(4, hiddenSize)(allInputSums)
