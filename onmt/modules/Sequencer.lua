@@ -24,7 +24,7 @@ function Sequencer:__init(network)
 end
 
 function Sequencer:_sharedClone()
-  local clone = self.network:clone('weight', 'gradWeight', 'bias', 'gradBias', 'fullWeight', 'fullBias', 'noiseInit')
+  local clone = self.network:clone('weight', 'weight_x', 'weight_h', 'gradWeight', 'grad_weight_h', 'grad_weight_x', 'bias', 'bias_x', 'bias_h', 'gradBias', 'grad_bias_x', 'grad_bias_h', 'fullWeight', 'fullBias', 'noiseInit')
 
   -- for tensors/table that can change dimension - copy the tensor itself
   local copyBuffers = { 'sharedNoise' }

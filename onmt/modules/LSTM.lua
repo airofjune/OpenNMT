@@ -114,13 +114,27 @@ function StartPool(num)
                    require('nn') 
                  end)      
    --_G.pool:specific(true) 
+
+   --Just try
+   local m = nn.ParallelTableCPU(nThread)
+   m:add(nn.Linear(1000, 2000)):add(nn.Linear(1000,2000))
+   x1 = torch.rand(1000)
+   x2 = torch.rand(1000)
+   y = m:forward{x1,x2}
+
 end 
 
-nThread = 1
-StartPool(nThread)
- 
---[[ Build a single LSTM unit layer. ]]
 function LSTM:_buildLayer(inputSize, hiddenSize)
+
+  local inputs = {}
+  table.insert(inputs, nn.Identity()())
+  table.insert(inputs, nn.Identity()())
+  table.insert(inputs, nn.Identity()())
+  local out = nn.LSTM(inputSize, hiddenSize)(inputs)
+  return nn.gModule(inputs, {out})
+end 
+--[[ Build a single LSTM unit layer. ]]
+function LSTM:_buildLayer1(inputSize, hiddenSize)
   local inputs = {}
   table.insert(inputs, nn.Identity()())
   table.insert(inputs, nn.Identity()())
@@ -133,8 +147,8 @@ function LSTM:_buildLayer(inputSize, hiddenSize)
   -- Evaluate the input sums at once for efficiency.
   --local i2h = nn.Linear(inputSize, 4 * hiddenSize)(x)
   --local h2h = nn.Linear(hiddenSize, 4 * hiddenSize)(prevH)
-  local m = nn.ParallelTableCPU(nThread):add(nn.Linear(inputSize, 4 * hiddenSize)):add(nn.Linear(hiddenSize, 4 * hiddenSize))
-  --local m = nn.ParallelTable():add(nn.Linear(inputSize, 4 * hiddenSize)):add(nn.Linear(hiddenSize, 4 * hiddenSize))
+  --local m = nn.ParallelTableCPU(nThread):add(nn.Linear(inputSize, 4 * hiddenSize)):add(nn.Linear(hiddenSize, 4 * hiddenSize))
+  local m = nn.ParallelTable():add(nn.Linear(inputSize, 4 * hiddenSize)):add(nn.Linear(hiddenSize, 4 * hiddenSize))
   local i2h, h2h = m({x, prevH})
 
 
