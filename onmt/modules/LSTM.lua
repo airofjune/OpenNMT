@@ -144,10 +144,6 @@ function LSTM:_buildLayer1(inputSize, hiddenSize)
   local prevH = inputs[2]
   local x = inputs[3]
 
-  -- Evaluate the input sums at once for efficiency.
-  --local i2h = nn.Linear(inputSize, 4 * hiddenSize)(x)
-  --local h2h = nn.Linear(hiddenSize, 4 * hiddenSize)(prevH)
-  --local m = nn.ParallelTableCPU(nThread):add(nn.Linear(inputSize, 4 * hiddenSize)):add(nn.Linear(hiddenSize, 4 * hiddenSize))
   local m = nn.ParallelTable():add(nn.Linear(inputSize, 4 * hiddenSize)):add(nn.Linear(hiddenSize, 4 * hiddenSize))
   local i2h, h2h = m({x, prevH})
 
