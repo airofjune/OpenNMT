@@ -129,6 +129,7 @@ end
 
 local function main()
   local opt = cmd:parse(arg)
+
   torch.setnumthreads(68)
   torch.setdefaulttensortype("torch.FloatTensor")
   torch.manualSeed(opt.seed)
